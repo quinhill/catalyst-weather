@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Switch, Route } from 'react-router-dom';
-import WeatherPage from '../../containers/Landing/Landing';
+import WeatherPage from '../../containers/WeatherPage/WeatherPage';
 import Landing from '../../containers/Landing/Landing';
 import './App.css';
 

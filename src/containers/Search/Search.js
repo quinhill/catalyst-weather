@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { getWeatherUrl } from '../../urlGenerator';
+import { getForecastUrl } from '../../urlGenerator';
 import { connect } from 'react-redux';
-import getWeatherThunk from '../../thunks/getWeatherThunk';
+import { withRouter } from 'react-router-dom';
+import getForecastThunk from '../../thunks/getForecastThunk';
+import { setLocation } from '../../actions';
 
 import './search.css';
 
@@ -9,7 +11,7 @@ export class Search extends Component {
   constructor() {
     super()
     this.state = {
-      search: ''
+      search: '',
     }
   }
 
@@ -20,36 +22,73 @@ export class Search extends Component {
 
   submitSearch = async (event) => {
     event.preventDefault();
-    const url = getWeatherUrl(this.state.search)
-    const response = await fetch(url);
-    const result = await response.json();
-    console.log(result);
+
+    const { search } = this.state;
+    const {
+      getForecast,
+      history
+    } = this.props;
+    
+    const checkStore = this.checkExisting();
+
+    if (checkStore.length) {
+      this.props.setLocation(search)
+    } else {
+      const forecastUrls = getForecastUrl(search);
+      await getForecast(forecastUrls);
+    }
+    this.setState({search: ''})
+    history.push('/weather-page');
   };
+
+  checkExisting = () => {
+    return this.props.weather.filter(place => {
+      return place.city.toUpperCase() === this.state.search.toUpperCase()
+    })
+  }
 
   render() {
 
     return (
-      <form
-        onSubmit={this.submitSearch}
-      >
-        <input
-          type='text'
-          onChange={this.changeSearch}
-          name='search'
-          value={this.state.search}
-        />
-        <button
-          type='submit'
+      <div>
+        <form
+          onSubmit={this.submitSearch}
+          className='search-form'
         >
-          Search
-        </button>
-      </form>
+          <input
+            type='text'
+            onChange={this.changeSearch}
+            name='search'
+            value={this.state.search}
+            className='search-input'
+          />  
+          <input
+            type='submit'
+            className='search-button'
+            value='search'
+          />
+        </form>
+        {
+          this.props.error 
+            ? <p className='error-message'>
+            It appears we do not have the weather for the location you searched for. Please check you spelling and try again.
+            </p>
+            : null
+        }
+      </div>
     )
   }
 }
 
-export const mapDispatchToProps = dispatch => ({
-  getWeather: url => dispatch(getWeatherThunk(url))
+export const mapStateToProps = state => ({
+  forecast: state.weather.forecast,
+  weather: state.weather,
+  error: state.hasErrored
 })
 
-export default connect(null, mapDispatchToProps)(Search);
+export const mapDispatchToProps = dispatch => ({
+  getForecast: urls => dispatch(getForecastThunk(urls)),
+  setLocation: city => dispatch(setLocation(city))
+});
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Search));

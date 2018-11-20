@@ -8,7 +8,17 @@ export const hasErrored = bool => ({
   hasErrored: bool
 });
 
-export const getWeather = weather => ({
-  type: 'GET_WEATHER',
-  weather
+export const getForecast = forecast => ({
+  type: 'GET_FORECAST',
+  forecast
 });
+
+export const setLocation = location => ({
+  type: 'SET_WEATHER',
+  location
+});
+
+export const getCurrent = weatherCurrent => ({
+  type: 'GET_CURRENT',
+  weatherCurrent
+})
