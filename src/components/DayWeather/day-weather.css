@@ -1,0 +1,19 @@
+.weather-div {
+  border: 2px solid #ffffff;
+  border-radius: 20px;
+  padding: 15px;
+  margin: 5px;
+  background: rgba(112, 125, 245, 0.527);
+  width: 200px;
+}
+
+.weather-icon {
+  height: 20px;
+  width: auto;
+}
+
+@media only screen and (max-width: 700px) {
+  .weather-div {
+    width: 90%;
+  }
+}
